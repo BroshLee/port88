@@ -20,7 +20,7 @@ import { education, achievements } from '../data/site';
         {
           education.map((e, i) => (
             <li class="reveal-3d" style={`--reveal-delay:${i * 90}ms`}>
-              <article class="card tilt tilt-sheen relative p-6" data-tilt="6">
+              <article class="card tilt relative p-6" data-tilt="6">
                 <div class="tilt-lift-sm">
                   <div class="flex items-baseline justify-between gap-4">
                     <span class="mono-xs text-faint">{String(i + 1).padStart(2, '0')}</span>

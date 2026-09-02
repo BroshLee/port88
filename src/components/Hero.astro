@@ -1,7 +1,10 @@
 ---
 import { hero, person } from '../data/site';
 import Arch3D from './Arch3D.astro';
-import Crystal from './Crystal.astro';
+import { SHIPS_WINTER } from '../data/design';
+
+// Winter-only decoration; dynamic so it drops out of an ember-only build.
+const Crystal = SHIPS_WINTER ? (await import('./Crystal.astro')).default : null;
 
 // Split each headline line around the emphasised word so the accent span stays in data.
 const lines = hero.titleLines.map((line) => {
@@ -16,7 +19,15 @@ const lines = hero.titleLines.map((line) => {
 });
 ---
 
-<section id="top" class="relative pt-28 sm:pt-32 lg:pt-36">
+<section id="top" class="relative overflow-hidden pt-28 sm:pt-32 lg:pt-36">
+  {/* Soft accent bloom behind the headline */}
+  <div
+    class="pointer-events-none absolute -top-40 left-1/2 h-[520px] w-[900px] -translate-x-1/2 rounded-full opacity-[0.18] blur-[130px]"
+    style="background: radial-gradient(closest-side, var(--accent), transparent 72%)"
+    aria-hidden="true"
+  >
+  </div>
+
   <div class="relative mx-auto max-w-6xl px-5 sm:px-8">
     <div class="grid items-center gap-12 lg:grid-cols-[1fr_1.12fr] lg:gap-12">
       <div>
@@ -105,11 +116,15 @@ const lines = hero.titleLines.map((line) => {
       </div>
 
       <div class="reveal relative lg:pl-4" style="--reveal-delay:440ms">
-        {/* Sits behind the card so it reads as rising out from behind it. */}
-        <Crystal
-          class="pointer-events-none absolute -right-6 -top-28 z-0 hidden opacity-60 lg:block"
-          size="155px"
-        />
+        {
+          Crystal && (
+            /* Sits behind the card so it reads as rising out from behind it. */
+            <Crystal
+              class="winter-only pointer-events-none absolute -right-6 -top-28 z-0 hidden opacity-60 lg:block"
+              size="155px"
+            />
+          )
+        }
         <div class="frost relative z-10 rounded-2xl p-5 sm:p-6">
           <div class="mb-4 flex items-center justify-between">
             <span class="eyebrow">The layer I work in</span>

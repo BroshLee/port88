@@ -25,7 +25,10 @@ const blocks = [
       // `transform`, and the reveal's rule would win and kill the tilt.
       projects.map((p, i) => (
         <div class="reveal-3d h-full" style={`--reveal-delay:${(i % 2) * 90}ms`}>
-          <article class="tilt tilt-sheen card group relative h-full p-6 sm:p-8" data-tilt="6">
+          <article
+            class="spotlight tilt group relative h-full rounded-2xl border border-line bg-bg-elev p-6 transition-[border-color] duration-500 hover:border-line-strong sm:p-8"
+            data-tilt="6"
+          >
             <div class="tilt-lift relative z-10" style="--lift:34px">
             <div class="flex items-start justify-between gap-4">
               <span class="mono-xs text-faint">{String(i + 1).padStart(2, '0')}</span>
@@ -79,8 +82,29 @@ const blocks = [
 </Section>
 
 <style>
-  /* Grid cells stretch, so the tilt origin should be the card's own centre. */
-  .tilt {
-    height: 100%;
+  /* Cursor-tracked highlight; --mx/--my are written by the tilt script. */
+  .spotlight::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    transition: opacity 0.5s var(--ease-out-expo);
+    background: radial-gradient(
+      420px circle at var(--mx, 50%) var(--my, 50%),
+      var(--accent-weak),
+      transparent 70%
+    );
+    pointer-events: none;
+  }
+
+  .spotlight:hover::before,
+  .spotlight:focus-within::before {
+    opacity: 1;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .spotlight::before {
+      display: none;
+    }
   }
 </style>

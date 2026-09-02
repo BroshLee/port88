@@ -4,6 +4,7 @@ import '@fontsource-variable/jetbrains-mono';
 import '@fontsource/instrument-serif';
 import '../styles/global.css';
 import { person, PROFILE_URLS } from '../data/site';
+import { DESIGN_MODE, FIXED_DESIGN, OG_DESIGN } from '../data/design';
 
 interface Props {
   title: string;
@@ -12,7 +13,17 @@ interface Props {
 
 const { title, description = person.metaDescription } = Astro.props;
 const canonical = new URL(Astro.url.pathname, Astro.site).toString();
-const ogImage = new URL('/og.png', Astro.site).toString();
+
+// Crawlers don't run scripts, so the social card commits to one design.
+const ogImage = new URL(`/og-${OG_DESIGN}.png`, Astro.site).toString();
+// In random mode the inline script swaps the icon once it has picked.
+const favicon = `/favicon-${FIXED_DESIGN ?? 'ember'}.svg`;
+
+const CHROME = {
+  ember: { dark: '#0a0b0d', light: '#f4f2ee' },
+  winter: { dark: '#060910', light: '#dde8f3' },
+};
+const chrome = CHROME[FIXED_DESIGN ?? 'ember'];
 
 const jsonLd = {
   '@context': 'https://schema.org',
@@ -36,7 +47,13 @@ const jsonLd = {
 ---
 
 <!doctype html>
-<html lang="en" data-theme="dark" class="no-js">
+<html
+  lang="en"
+  data-theme="dark"
+  data-design={FIXED_DESIGN ?? 'ember'}
+  data-design-mode={DESIGN_MODE}
+  class="no-js"
+>
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -57,22 +74,49 @@ const jsonLd = {
     <meta name="twitter:description" content={description} />
     <meta name="twitter:image" content={ogImage} />
 
-    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
-    <meta name="theme-color" content="#060910" media="(prefers-color-scheme: dark)" />
-    <meta name="theme-color" content="#eef5fb" media="(prefers-color-scheme: light)" />
+    <link rel="icon" href={favicon} type="image/svg+xml" />
+    <meta name="theme-color" content={chrome.dark} media="(prefers-color-scheme: dark)" />
+    <meta name="theme-color" content={chrome.light} media="(prefers-color-scheme: light)" />
 
     <script is:inline set:html={JSON.stringify(jsonLd)} type="application/ld+json" />
 
-    {/* Runs before paint so the stored theme never flashes. */}
+    {/* Runs before paint so neither the stored theme nor the random design flashes. */}
     <script is:inline>
       (() => {
         const root = document.documentElement;
         root.classList.remove('no-js');
+
+        const pick = () => (Math.random() < 0.5 ? 'ember' : 'winter');
+        const valid = (d) => d === 'ember' || d === 'winter';
+
         try {
+          // ?design=winter forces and pins a design — handy for sharing a
+          // specific look, and for checking both in a random build.
+          const forced = new URLSearchParams(location.search).get('design');
+
+          if (valid(forced)) {
+            root.dataset.design = forced;
+            localStorage.setItem('design', forced);
+          } else if (root.dataset.designMode === 'random') {
+            let d = localStorage.getItem('design');
+            if (!valid(d)) {
+              d = pick();
+              // Stored so the design stays put on reload rather than
+              // re-rolling and looking broken.
+              localStorage.setItem('design', d);
+            }
+            root.dataset.design = d;
+          }
+
+          const icon = document.querySelector('link[rel="icon"]');
+          if (icon) icon.href = '/favicon-' + root.dataset.design + '.svg';
+
           const saved = localStorage.getItem('theme');
           const prefersLight = window.matchMedia('(prefers-color-scheme: light)').matches;
           root.dataset.theme = saved || (prefersLight ? 'light' : 'dark');
         } catch {
+          // Private mode can throw on localStorage; fall back to a fixed look.
+          if (root.dataset.designMode === 'random') root.dataset.design = pick();
           root.dataset.theme = 'dark';
         }
       })();

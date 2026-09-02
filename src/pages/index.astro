@@ -1,7 +1,6 @@
 ---
 import Base from '../layouts/Base.astro';
 import Nav from '../components/Nav.astro';
-import Atmosphere from '../components/Atmosphere.astro';
 import Hero from '../components/Hero.astro';
 import About from '../components/About.astro';
 import Skills from '../components/Skills.astro';
@@ -11,10 +10,15 @@ import Education from '../components/Education.astro';
 import Contact from '../components/Contact.astro';
 import Footer from '../components/Footer.astro';
 import { person } from '../data/site';
+import { SHIPS_WINTER } from '../data/design';
+
+// Dynamic import so the aurora/snowfall markup and styles are left out of the
+// build entirely on an ember-only build.
+const Atmosphere = SHIPS_WINTER ? (await import('../components/Atmosphere.astro')).default : null;
 ---
 
 <Base title={`${person.name} — ${person.headline}`}>
-  <Atmosphere />
+  {Atmosphere && <Atmosphere />}
   <Nav />
   <main id="main">
     <Hero />
