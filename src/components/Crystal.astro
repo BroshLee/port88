@@ -1,5 +1,6 @@
 ---
-// Three snowflake planes intersecting at 60° in 3D space, spinning as one solid.
+// Winter-only: three snowflake planes intersecting at 60° in 3D space,
+// spinning as one solid.
 interface Props {
   class?: string;
   size?: string;
@@ -68,6 +69,11 @@ const planes = [0, 60, 120];
   /* The face-on plane reads as the "front" of the crystal. */
   .crystal-plane:first-child {
     opacity: 0.9;
+  }
+
+  @keyframes crystal-spin {
+    from { transform: rotateX(-16deg) rotateY(0deg); }
+    to   { transform: rotateX(-16deg) rotateY(360deg); }
   }
 
   @media (prefers-reduced-motion: reduce) {

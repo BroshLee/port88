@@ -1,3 +1,5 @@
+import { SHIPS_WINTER } from '../data/design';
+
 const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 /* ── Theme ─────────────────────────────────────────────────────────────── */
@@ -218,6 +220,7 @@ function initTilt() {
         const py = (e.clientY - r.top) / r.height - 0.5;
         el.style.setProperty('--ry', `${px * max * 2}deg`);
         el.style.setProperty('--rx', `${-py * max * 2}deg`);
+        // Same pointer position also drives the .spotlight glow.
         el.style.setProperty('--mx', `${(px + 0.5) * 100}%`);
         el.style.setProperty('--my', `${(py + 0.5) * 100}%`);
       });
@@ -274,8 +277,11 @@ function initArchScene() {
   });
 }
 
-/* ── Snowfall ──────────────────────────────────────────────────────────── */
+/* ── Snowfall (winter design only) ─────────────────────────────────────── */
 function initSnow() {
+  // In random mode the canvas ships either way, so the resolved design decides.
+  if (document.documentElement.dataset.design !== 'winter') return;
+
   const canvas = document.querySelector<HTMLCanvasElement>('[data-snow]');
   if (!canvas || reduceMotion) return;
 
@@ -319,7 +325,7 @@ function initSnow() {
   };
 
   const snowColor = () =>
-    document.documentElement.dataset.theme === 'light' ? '190, 215, 240' : '235, 246, 255';
+    document.documentElement.dataset.theme === 'light' ? '130, 165, 200' : '235, 246, 255';
 
   let last = performance.now();
 
@@ -467,7 +473,8 @@ function boot() {
   initTilt();
   initArchScene();
   initArchDiagram();
-  initSnow();
+  // Literal const, so the bundler drops initSnow entirely on an ember-only build.
+  if (SHIPS_WINTER) initSnow();
   initContactForm();
 }
 

@@ -1,7 +1,7 @@
 ---
-// The request path Ankit works in, staged in 3D: frosted service panels
-// floating above a wiring plane. Labels describe real techniques from the
-// resume — deliberately no fabricated latency numbers.
+// The request path Ankit works in, staged in 3D: service panels floating above
+// a wiring plane. Labels describe real techniques from the resume —
+// deliberately no fabricated latency numbers.
 const nodes = [
   // Modest z-lift: enough to read as floating, small enough that each panel
   // still visually lands on the rail it belongs to under the stage rotation.
@@ -25,12 +25,12 @@ const edges = [
   { d: 'M408,288 C438,288 444,262 470,262', delay: '1.3s' },
 ];
 
-// Decorative ice shards, placed at depths that bracket the node layer.
+// Decorative shards, placed at depths that bracket the node layer.
 const shards = [
-  { x: 18, y: 14, z: 130, s: 26, r: 18, d: '0s' },
-  { x: 76, y: 8, z: -70, s: 18, r: -24, d: '1.4s' },
-  { x: 46, y: 90, z: 118, s: 20, r: 40, d: '2.2s' },
-  { x: 96, y: 52, z: -60, s: 15, r: -12, d: '3.1s' },
+  { x: 18, y: 12, z: 130, s: 24, r: 18, d: '0s' },
+  { x: 76, y: 6, z: -70, s: 17, r: -24, d: '1.4s' },
+  { x: 44, y: 92, z: 118, s: 19, r: 40, d: '2.2s' },
+  { x: 97, y: 52, z: -60, s: 14, r: -12, d: '3.1s' },
 ];
 ---
 
@@ -44,12 +44,7 @@ const shards = [
   <div class="arch-viewport scene" data-arch-scene>
     <div class="arch-stage preserve-3d" data-arch-stage>
       {/* Base plane: the wiring the panels float above */}
-      <svg
-        class="arch-rails"
-        viewBox="0 58 584 278"
-        aria-hidden="true"
-        preserveAspectRatio="none"
-      >
+      <svg class="arch-rails" viewBox="0 58 584 278" aria-hidden="true" preserveAspectRatio="none">
         <defs>
           <linearGradient id="flowGrad" x1="0" y1="0" x2="1" y2="0">
             <stop offset="0%" stop-color="var(--flow)" stop-opacity="0" />
@@ -67,7 +62,7 @@ const shards = [
         </g>
       </svg>
 
-      {/* Floating ice shards for depth cueing */}
+      {/* Floating shards for depth cueing */}
       {
         shards.map((s) => (
           <span
@@ -177,11 +172,9 @@ const shards = [
     background:
       linear-gradient(150deg, var(--frost-edge), var(--frost) 45%, transparent),
       var(--surface);
-    backdrop-filter: blur(6px);
-    -webkit-backdrop-filter: blur(6px);
     box-shadow:
-      0 1px 0 rgb(var(--snow) / 0.14) inset,
-      0 14px 26px -14px rgb(0 0 0 / 0.7);
+      0 1px 0 rgb(255 255 255 / 0.06) inset,
+      0 14px 26px -14px rgb(0 0 0 / 0.65);
     transition:
       border-color 0.4s var(--ease-out-expo),
       box-shadow 0.4s var(--ease-out-expo);
@@ -216,7 +209,7 @@ const shards = [
   .arch-node:focus-visible .arch-node-face {
     border-color: var(--accent);
     box-shadow:
-      0 1px 0 rgb(var(--snow) / 0.2) inset,
+      0 1px 0 rgb(255 255 255 / 0.08) inset,
       0 0 0 1px var(--accent-weak),
       0 22px 40px -18px var(--glow);
   }
@@ -228,9 +221,9 @@ const shards = [
     transform: translate(-50%, -50%) translateZ(var(--z)) rotate(var(--r));
     background: linear-gradient(140deg, var(--accent-weak), transparent);
     border: 1px solid var(--line-strong);
-    /* Hexagonal ice fragment. */
+    /* Hexagonal fragment. */
     clip-path: polygon(50% 0%, 93% 25%, 93% 75%, 50% 100%, 7% 75%, 7% 25%);
-    opacity: 0.5;
+    opacity: 0.55;
     animation: float-y 7s ease-in-out infinite;
     pointer-events: none;
   }
