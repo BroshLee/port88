@@ -1,0 +1,91 @@
+---
+import '@fontsource-variable/inter';
+import '@fontsource-variable/jetbrains-mono';
+import '@fontsource/instrument-serif';
+import '../styles/global.css';
+import { person, PROFILE_URLS } from '../data/site';
+
+interface Props {
+  title: string;
+  description?: string;
+}
+
+const { title, description = person.metaDescription } = Astro.props;
+const canonical = new URL(Astro.url.pathname, Astro.site).toString();
+const ogImage = new URL('/og.png', Astro.site).toString();
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Person',
+  name: person.name,
+  jobTitle: person.role,
+  description: person.metaDescription,
+  email: `mailto:${person.email}`,
+  url: canonical,
+  address: { '@type': 'PostalAddress', addressLocality: 'Delhi', addressCountry: 'IN' },
+  sameAs: [PROFILE_URLS.github, PROFILE_URLS.linkedin],
+  knowsAbout: [
+    'Golang', 'Node.js', 'Laravel', 'Microservices', 'Distributed Systems',
+    'Redis', 'MySQL', 'System Design', 'Retrieval-Augmented Generation',
+  ],
+  alumniOf: [
+    { '@type': 'CollegeOrUniversity', name: 'Graphic Era Hill University' },
+    { '@type': 'CollegeOrUniversity', name: 'Himalayan Institute of Technology' },
+  ],
+};
+---
+
+<!doctype html>
+<html lang="en" data-theme="dark" class="no-js">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    <meta name="author" content={person.name} />
+    <meta name="robots" content="index, follow" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:site_name" content={person.name} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImage} />
+
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <meta name="theme-color" content="#060910" media="(prefers-color-scheme: dark)" />
+    <meta name="theme-color" content="#eef5fb" media="(prefers-color-scheme: light)" />
+
+    <script is:inline set:html={JSON.stringify(jsonLd)} type="application/ld+json" />
+
+    {/* Runs before paint so the stored theme never flashes. */}
+    <script is:inline>
+      (() => {
+        const root = document.documentElement;
+        root.classList.remove('no-js');
+        try {
+          const saved = localStorage.getItem('theme');
+          const prefersLight = window.matchMedia('(prefers-color-scheme: light)').matches;
+          root.dataset.theme = saved || (prefersLight ? 'light' : 'dark');
+        } catch {
+          root.dataset.theme = 'dark';
+        }
+      })();
+    </script>
+  </head>
+
+  <body class="grid-bg antialiased">
+    <a
+      href="#main"
+      class="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[100] focus:rounded-lg focus:bg-accent focus:px-4 focus:py-2 focus:text-sm focus:font-medium focus:text-on-accent"
+    >
+      Skip to content
+    </a>
+    <slot />
+  </body>
+</html>

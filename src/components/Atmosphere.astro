@@ -1,0 +1,92 @@
+---
+// Fixed background layer: drifting aurora bands plus the snowfall canvas mount.
+// Sits behind all content and never intercepts pointer events.
+---
+
+<div class="atmos" aria-hidden="true">
+  <div class="aurora-band aurora" style="--aurora-duration:28s"></div>
+  <div class="aurora-band aurora band-2" style="--aurora-duration:37s"></div>
+  <div class="aurora-band aurora band-3" style="--aurora-duration:44s"></div>
+  <div class="horizon"></div>
+</div>
+
+{/* Painted by the snowfall script; stays empty if motion is reduced. */}
+<canvas class="snow-canvas" data-snow aria-hidden="true"></canvas>
+
+<style>
+  .atmos {
+    position: fixed;
+    inset: 0;
+    z-index: -2;
+    overflow: hidden;
+    pointer-events: none;
+  }
+
+  .aurora-band {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(90px);
+    opacity: 0.4;
+    will-change: transform;
+  }
+
+  .aurora-band:nth-child(1) {
+    top: -22%;
+    left: -10%;
+    width: 70vw;
+    height: 55vh;
+    background: radial-gradient(closest-side, var(--accent), transparent 72%);
+  }
+
+  .band-2 {
+    top: -14%;
+    right: -18%;
+    left: auto;
+    width: 62vw;
+    height: 60vh;
+    background: radial-gradient(closest-side, var(--flow), transparent 72%);
+    opacity: 0.3;
+  }
+
+  .band-3 {
+    top: 34%;
+    left: 22%;
+    width: 58vw;
+    height: 48vh;
+    background: radial-gradient(closest-side, var(--accent), transparent 74%);
+    opacity: 0.18;
+  }
+
+  /* Cold ground glow so the page bottom doesn't read as empty black. */
+  .horizon {
+    position: absolute;
+    inset: auto 0 0 0;
+    height: 40vh;
+    background: linear-gradient(to top, var(--accent-weak), transparent);
+    opacity: 0.7;
+  }
+
+  .snow-canvas {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+    pointer-events: none;
+  }
+
+  /* On a light page the bands wash out text contrast, so keep them faint. */
+  [data-theme='light'] .aurora-band {
+    opacity: 0.1;
+  }
+
+  [data-theme='light'] .horizon {
+    opacity: 0.28;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .aurora-band {
+      animation: none;
+    }
+  }
+</style>

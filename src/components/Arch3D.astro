@@ -1,0 +1,247 @@
+---
+// The request path Ankit works in, staged in 3D: frosted service panels
+// floating above a wiring plane. Labels describe real techniques from the
+// resume — deliberately no fabricated latency numbers.
+const nodes = [
+  // Modest z-lift: enough to read as floating, small enough that each panel
+  // still visually lands on the rail it belongs to under the stage rotation.
+  { id: 'client', x: 11.0, y: 50.0, z: 14, title: 'Client', sub: 'HTTPS', note: 'Requests arrive over HTTPS from web and mobile clients.' },
+  { id: 'edge', x: 34.1, y: 50.0, z: 24, title: 'Nginx', sub: 'LB · autoscale', note: 'Nginx load balancing and auto-scaling absorb traffic spikes without degradation.' },
+  { id: 'svc-a', x: 60.8, y: 16.5, z: 34, title: 'Go service', sub: 'Gin · gRPC', note: 'Golang services with JWT auth, rate limiting and circuit breakers, talking over gRPC.' },
+  { id: 'svc-b', x: 60.8, y: 49.6, z: 34, title: 'Go service', sub: 'REST API', note: 'RESTful APIs designed for low latency and predictable failure behaviour.' },
+  { id: 'svc-c', x: 60.8, y: 82.7, z: 34, title: 'Laravel', sub: 'queues', note: 'Laravel services handling asynchronous work through message queues.' },
+  { id: 'cache', x: 88.5, y: 25.9, z: 22, title: 'Redis', sub: 'cluster', note: 'Distributed caching layer on a Redis cluster — fewer database hits, faster reads.' },
+  { id: 'db', x: 88.5, y: 73.4, z: 22, title: 'MySQL', sub: 'replicas', note: 'Indexed, query-tuned MySQL with read replicas and connection pooling.' },
+];
+
+const edges = [
+  { d: 'M96,197 H150', delay: '0s' },
+  { d: 'M248,197 C274,197 278,104 302,104', delay: '0.35s' },
+  { d: 'M248,197 H302', delay: '0.15s' },
+  { d: 'M248,197 C274,197 278,288 302,288', delay: '0.55s' },
+  { d: 'M408,104 H470', delay: '0.9s' },
+  { d: 'M408,196 C438,196 444,130 470,130', delay: '0.75s' },
+  { d: 'M408,196 C438,196 444,262 470,262', delay: '1.1s' },
+  { d: 'M408,288 C438,288 444,262 470,262', delay: '1.3s' },
+];
+
+// Decorative ice shards, placed at depths that bracket the node layer.
+const shards = [
+  { x: 18, y: 14, z: 130, s: 26, r: 18, d: '0s' },
+  { x: 76, y: 8, z: -70, s: 18, r: -24, d: '1.4s' },
+  { x: 46, y: 90, z: 118, s: 20, r: 40, d: '2.2s' },
+  { x: 96, y: 52, z: -60, s: 15, r: -12, d: '3.1s' },
+];
+---
+
+<figure class="arch" data-arch>
+  <figcaption class="sr-only">
+    Three-dimensional diagram of a request path: client to Nginx load balancer, fanning out to
+    Golang and Laravel services, which read from a Redis cluster and a MySQL primary with read
+    replicas.
+  </figcaption>
+
+  <div class="arch-viewport scene" data-arch-scene>
+    <div class="arch-stage preserve-3d" data-arch-stage>
+      {/* Base plane: the wiring the panels float above */}
+      <svg
+        class="arch-rails"
+        viewBox="0 58 584 278"
+        aria-hidden="true"
+        preserveAspectRatio="none"
+      >
+        <defs>
+          <linearGradient id="flowGrad" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0%" stop-color="var(--flow)" stop-opacity="0" />
+            <stop offset="50%" stop-color="var(--flow)" stop-opacity="1" />
+            <stop offset="100%" stop-color="var(--flow)" stop-opacity="0" />
+          </linearGradient>
+        </defs>
+
+        <g fill="none" stroke="var(--line-strong)" stroke-width="1.25">
+          {edges.map((e) => <path d={e.d} />)}
+        </g>
+
+        <g fill="none" stroke="url(#flowGrad)" stroke-width="2.5" stroke-linecap="round">
+          {edges.map((e) => <path class="arch-flow" d={e.d} style={`animation-delay:${e.delay}`} />)}
+        </g>
+      </svg>
+
+      {/* Floating ice shards for depth cueing */}
+      {
+        shards.map((s) => (
+          <span
+            class="arch-shard"
+            aria-hidden="true"
+            style={`left:${s.x}%;top:${s.y}%;--z:${s.z}px;--s:${s.s}px;--r:${s.r}deg;animation-delay:${s.d}`}
+          />
+        ))
+      }
+
+      {/* Service panels, lifted off the wiring plane */}
+      {
+        nodes.map((n) => (
+          <button
+            type="button"
+            class="arch-node"
+            data-node={n.id}
+            style={`left:${n.x}%;top:${n.y}%;--z:${n.z}px`}
+            aria-label={`${n.title}: ${n.note}`}
+          >
+            <span class="arch-node-face">
+              <span class="arch-title">{n.title}</span>
+              <span class="arch-sub">{n.sub}</span>
+            </span>
+          </button>
+        ))
+      }
+    </div>
+  </div>
+
+  <p
+    class="mt-4 min-h-[2.5rem] font-mono text-[12px] leading-relaxed text-muted"
+    data-arch-note
+    aria-live="polite"
+  >
+    Hover or focus a node to read what it does.
+  </p>
+</figure>
+
+<style>
+  .arch-viewport {
+    container-type: inline-size;
+    --perspective: 900px;
+  }
+
+  .arch-stage {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 584 / 278;
+    /* Resting tilt so the scene reads as 3D before any interaction. */
+    transform: rotateX(var(--srx, 7deg)) rotateY(var(--sry, -11deg));
+    transition: transform 0.9s var(--ease-out-expo);
+  }
+
+  .arch-stage.is-tracking {
+    transition: transform 0.14s linear;
+  }
+
+  .arch-rails {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+  }
+
+  /* Dash length must exceed the longest path so only one packet rides at a time. */
+  .arch-flow {
+    stroke-dasharray: 26 340;
+    stroke-dashoffset: 366;
+    animation: arch-travel 3.4s linear infinite;
+    filter: drop-shadow(0 0 4px var(--flow));
+  }
+
+  @keyframes arch-travel {
+    to {
+      stroke-dashoffset: 0;
+    }
+  }
+
+  .arch-node {
+    position: absolute;
+    width: 20.5%;
+    height: 22%;
+    padding: 0;
+    border: 0;
+    background: none;
+    cursor: pointer;
+    transform: translate(-50%, -50%) translateZ(var(--z));
+    transform-style: preserve-3d;
+    transition: transform 0.55s var(--ease-spring);
+  }
+
+  .arch-node-face {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.15em;
+    padding-inline: 0.4em;
+    text-align: center;
+    border-radius: 0.7em;
+    /* line-strong, not frost-edge — a near-white edge vanishes in light mode. */
+    border: 1px solid var(--line-strong);
+    background:
+      linear-gradient(150deg, var(--frost-edge), var(--frost) 45%, transparent),
+      var(--surface);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    box-shadow:
+      0 1px 0 rgb(var(--snow) / 0.14) inset,
+      0 14px 26px -14px rgb(0 0 0 / 0.7);
+    transition:
+      border-color 0.4s var(--ease-out-expo),
+      box-shadow 0.4s var(--ease-out-expo);
+    /* Container units keep labels legible as the card resizes. */
+    font-size: clamp(9.5px, 2.95cqw, 16px);
+  }
+
+  .arch-title {
+    font-family: var(--font-sans);
+    font-size: 1em;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    color: var(--text);
+    line-height: 1.1;
+  }
+
+  .arch-sub {
+    font-family: var(--font-mono);
+    font-size: 0.72em;
+    letter-spacing: 0.04em;
+    color: var(--faint);
+    line-height: 1.1;
+  }
+
+  .arch-node:hover,
+  .arch-node:focus-visible {
+    transform: translate(-50%, -50%) translateZ(calc(var(--z) + 42px));
+    outline: none;
+  }
+
+  .arch-node:hover .arch-node-face,
+  .arch-node:focus-visible .arch-node-face {
+    border-color: var(--accent);
+    box-shadow:
+      0 1px 0 rgb(var(--snow) / 0.2) inset,
+      0 0 0 1px var(--accent-weak),
+      0 22px 40px -18px var(--glow);
+  }
+
+  .arch-shard {
+    position: absolute;
+    width: var(--s);
+    height: var(--s);
+    transform: translate(-50%, -50%) translateZ(var(--z)) rotate(var(--r));
+    background: linear-gradient(140deg, var(--accent-weak), transparent);
+    border: 1px solid var(--line-strong);
+    /* Hexagonal ice fragment. */
+    clip-path: polygon(50% 0%, 93% 25%, 93% 75%, 50% 100%, 7% 75%, 7% 25%);
+    opacity: 0.5;
+    animation: float-y 7s ease-in-out infinite;
+    pointer-events: none;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .arch-flow,
+    .arch-shard {
+      display: none;
+    }
+    .arch-stage {
+      transform: none;
+    }
+  }
+</style>

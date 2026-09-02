@@ -1,0 +1,60 @@
+---
+import Section from './Section.astro';
+import { about } from '../data/site';
+---
+
+<Section id="about" index="01" title="About">
+  <h2 slot="heading" class="display-sm mt-5 max-w-3xl">
+    I like the problems that only show up <em class="text-accent">at scale</em>.
+  </h2>
+
+  <div class="grid gap-12 lg:grid-cols-[1.15fr_0.85fr] lg:gap-16">
+    <div>
+      <div class="space-y-5">
+        {
+          about.paragraphs.map((p, i) => (
+            <p
+              class="reveal text-[15px] leading-[1.75] text-muted sm:text-[16px]"
+              style={`--reveal-delay:${i * 90}ms`}
+            >
+              {p}
+            </p>
+          ))
+        }
+      </div>
+
+      <div class="mt-12 grid gap-px overflow-hidden rounded-xl border border-line bg-line sm:grid-cols-2">
+        {
+          about.pillars.map((p, i) => (
+            <article
+              class="reveal group bg-bg-elev p-6 transition-colors duration-500 hover:bg-surface-2"
+              style={`--reveal-delay:${i * 80}ms`}
+            >
+              <div class="mb-3 flex h-7 w-7 items-center justify-center rounded-md border border-line bg-surface font-mono text-[10px] text-accent transition-transform duration-500 group-hover:rotate-6">
+                {String(i + 1).padStart(2, '0')}
+              </div>
+              <h3 class="text-[15px] font-semibold tracking-tight text-text">{p.title}</h3>
+              <p class="mt-2 text-[13.5px] leading-relaxed text-muted">{p.body}</p>
+            </article>
+          ))
+        }
+      </div>
+    </div>
+
+    <aside class="reveal lg:sticky lg:top-28 lg:self-start" style="--reveal-delay:120ms">
+      <div class="rounded-xl border border-line bg-bg-elev p-6">
+        <span class="eyebrow">At a glance</span>
+        <dl class="mt-5 space-y-0">
+          {
+            about.facts.map((f) => (
+              <div class="flex items-baseline justify-between gap-4 border-b border-line py-3.5 last:border-0">
+                <dt class="mono-xs shrink-0 text-faint">{f.k}</dt>
+                <dd class="text-right text-[13.5px] font-medium text-text">{f.v}</dd>
+              </div>
+            ))
+          }
+        </dl>
+      </div>
+    </aside>
+  </div>
+</Section>

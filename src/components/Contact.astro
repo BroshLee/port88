@@ -1,0 +1,179 @@
+---
+import Section from './Section.astro';
+import { person, socials, CONTACT_FORM_KEY } from '../data/site';
+---
+
+<Section
+  id="contact"
+  index="06"
+  title="Contact"
+  divider={false}
+  lead="Open to backend and platform engineering roles, and happy to talk through a system design problem either way. I reply to everything."
+>
+  <h2 slot="heading" class="display-sm mt-5 max-w-3xl">
+    Let's build something <em class="text-accent">solid</em>.
+  </h2>
+
+  <div class="grid gap-10 lg:grid-cols-[0.9fr_1.1fr] lg:gap-16">
+    <div class="reveal space-y-4">
+      <a
+        href={`mailto:${person.email}`}
+        class="card group flex items-center justify-between gap-4 p-6"
+      >
+        <div class="min-w-0">
+          <span class="eyebrow">Email</span>
+          <p class="mt-2 truncate text-[15px] font-medium text-text">{person.email}</p>
+        </div>
+        <svg
+          class="h-4 w-4 shrink-0 text-faint transition-transform duration-400 group-hover:translate-x-1 group-hover:text-accent"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.8"
+          aria-hidden="true"
+        >
+          <path d="M7 17L17 7M9 7h8v8"></path>
+        </svg>
+      </a>
+
+      <div class="card p-6">
+        <span class="eyebrow">Based in</span>
+        <p class="mt-2 text-[15px] font-medium text-text">{person.location}</p>
+        <p class="mt-1 mono-xs text-faint">{person.timezone}</p>
+      </div>
+
+      <div class="card p-6">
+        <span class="eyebrow">Elsewhere</span>
+        <ul class="mt-4 space-y-3">
+          {
+            socials
+              .filter((s) => s.label !== 'Email')
+              .map((s) => (
+                <li>
+                  <a
+                    href={s.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="group flex items-center justify-between gap-4 text-[14px] text-muted transition-colors hover:text-text"
+                  >
+                    <span class="link-wipe font-medium">{s.label}</span>
+                    <span class="mono-xs text-faint">{s.handle}</span>
+                  </a>
+                </li>
+              ))
+          }
+        </ul>
+      </div>
+
+      <a
+        href={person.resumePath}
+        download
+        class="card group flex items-center justify-between gap-4 p-6"
+      >
+        <div>
+          <span class="eyebrow">Résumé</span>
+          <p class="mt-2 text-[15px] font-medium text-text">Download PDF</p>
+        </div>
+        <svg
+          class="h-4 w-4 shrink-0 text-faint transition-transform duration-400 group-hover:translate-y-0.5 group-hover:text-accent"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.8"
+          aria-hidden="true"
+        >
+          <path d="M12 3v12M7 11l5 5 5-5M5 21h14"></path>
+        </svg>
+      </a>
+    </div>
+
+    <div class="reveal" style="--reveal-delay:120ms">
+      <form
+        class="card p-6 sm:p-8"
+        data-contact-form
+        data-endpoint="https://api.web3forms.com/submit"
+        data-mailto={`mailto:${person.email}`}
+        novalidate
+      >
+        <input type="hidden" name="access_key" value={CONTACT_FORM_KEY} />
+        <input type="hidden" name="subject" value="New message from your portfolio" />
+        {/* Honeypot — bots fill it, humans never see it. */}
+        <input
+          type="checkbox"
+          name="botcheck"
+          class="hidden"
+          style="display:none"
+          tabindex="-1"
+          autocomplete="off"
+        />
+
+        <div class="grid gap-5 sm:grid-cols-2">
+          <div>
+            <label for="cf-name" class="eyebrow mb-2 block">Name</label>
+            <input
+              id="cf-name"
+              name="name"
+              type="text"
+              required
+              autocomplete="name"
+              class="w-full rounded-lg border border-line bg-bg px-3.5 py-2.5 text-[14px] text-text outline-none transition-colors duration-300 placeholder:text-faint focus:border-accent"
+              placeholder="Your name"
+            />
+          </div>
+          <div>
+            <label for="cf-email" class="eyebrow mb-2 block">Email</label>
+            <input
+              id="cf-email"
+              name="email"
+              type="email"
+              required
+              autocomplete="email"
+              class="w-full rounded-lg border border-line bg-bg px-3.5 py-2.5 text-[14px] text-text outline-none transition-colors duration-300 placeholder:text-faint focus:border-accent"
+              placeholder="you@company.com"
+            />
+          </div>
+        </div>
+
+        <div class="mt-5">
+          <label for="cf-message" class="eyebrow mb-2 block">Message</label>
+          <textarea
+            id="cf-message"
+            name="message"
+            rows="5"
+            required
+            class="w-full resize-y rounded-lg border border-line bg-bg px-3.5 py-2.5 text-[14px] leading-relaxed text-text outline-none transition-colors duration-300 placeholder:text-faint focus:border-accent"
+            placeholder="Role, team, what you're building — or just say hello."></textarea>
+        </div>
+
+        <div class="mt-6 flex flex-wrap items-center gap-4">
+          <button
+            type="submit"
+            class="group inline-flex items-center gap-2 rounded-xl bg-accent px-5 py-3 text-sm font-semibold text-on-accent transition-transform duration-300 hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-60"
+            data-submit
+          >
+            <span data-submit-label>Send message</span>
+            <svg
+              class="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              aria-hidden="true"
+            >
+              <path d="M5 12h14M13 6l6 6-6 6"></path>
+            </svg>
+          </button>
+          <p class="mono-xs text-faint">Usually replies within a day</p>
+        </div>
+
+        <p
+          class="mt-4 hidden text-[13px] leading-relaxed"
+          data-form-status
+          role="status"
+          aria-live="polite"
+        >
+        </p>
+      </form>
+    </div>
+  </div>
+</Section>

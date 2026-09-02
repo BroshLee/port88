@@ -1,0 +1,33 @@
+---
+import Base from '../layouts/Base.astro';
+import Nav from '../components/Nav.astro';
+import Atmosphere from '../components/Atmosphere.astro';
+import Hero from '../components/Hero.astro';
+import About from '../components/About.astro';
+import Skills from '../components/Skills.astro';
+import Experience from '../components/Experience.astro';
+import Projects from '../components/Projects.astro';
+import Education from '../components/Education.astro';
+import Contact from '../components/Contact.astro';
+import Footer from '../components/Footer.astro';
+import { person } from '../data/site';
+---
+
+<Base title={`${person.name} — ${person.headline}`}>
+  <Atmosphere />
+  <Nav />
+  <main id="main">
+    <Hero />
+    <About />
+    <Skills />
+    <Experience />
+    <Projects />
+    <Education />
+    <Contact />
+  </main>
+  <Footer />
+</Base>
+
+<script>
+  import '../scripts/main.ts';
+</script>

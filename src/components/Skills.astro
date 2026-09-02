@@ -1,0 +1,64 @@
+---
+import Section from './Section.astro';
+import { skillGroups } from '../data/site';
+
+// Marquee band — the technologies worth reading at a glance.
+const marquee = [
+  'Golang', 'Microservices', 'Redis', 'MySQL', 'gRPC', 'Node.js', 'Laravel',
+  'Nginx', 'System Design', 'RAG', 'Vector DBs', 'Docker', 'Python',
+  'Distributed Caching', 'Observability', 'PostgreSQL', 'CI/CD',
+];
+---
+
+<Section
+  id="skills"
+  index="02"
+  title="Skills"
+  lead="Grouped by where each piece sits in a request's path rather than alphabetically — because that's how the decisions actually get made."
+>
+  <h2 slot="heading" class="display-sm mt-5 max-w-3xl">
+    The stack, <em class="text-accent">layer by layer</em>.
+  </h2>
+
+  <div class="marquee edge-fade reveal mb-14 overflow-hidden border-y border-line py-4">
+    <div class="marquee-track flex w-max items-center gap-3">
+      {
+        [...marquee, ...marquee].map((m, i) => (
+          <span
+            class="flex items-center gap-3 whitespace-nowrap text-[13px] text-muted"
+            aria-hidden={i >= marquee.length ? 'true' : undefined}
+          >
+            {m}
+            <span class="text-accent/50">•</span>
+          </span>
+        ))
+      }
+    </div>
+  </div>
+
+  <div class="grid gap-px overflow-hidden rounded-xl border border-line bg-line md:grid-cols-2">
+    {
+      skillGroups.map((g, i) => (
+        <article
+          class="reveal group bg-bg-elev p-6 transition-colors duration-500 hover:bg-surface sm:p-7"
+          style={`--reveal-delay:${(i % 2) * 70}ms`}
+          data-skill-group
+        >
+          <div class="flex items-baseline justify-between gap-4">
+            <h3 class="text-base font-semibold tracking-tight text-text">{g.layer}</h3>
+            <span class="mono-xs shrink-0 text-faint">{String(g.items.length).padStart(2, '0')}</span>
+          </div>
+          <p class="mt-1.5 text-[13px] text-faint">{g.caption}</p>
+
+          <ul class="mt-5 flex flex-wrap gap-2">
+            {g.items.map((item) => (
+              <li>
+                <span class="chip">{item}</span>
+              </li>
+            ))}
+          </ul>
+        </article>
+      ))
+    }
+  </div>
+</Section>

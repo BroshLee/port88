@@ -1,0 +1,450 @@
+@import 'tailwindcss';
+
+/* Dark is the default; the toggle writes data-theme onto <html>. */
+@custom-variant light (&:where([data-theme='light'], [data-theme='light'] *));
+
+/* Polar night */
+:root,
+[data-theme='dark'] {
+  --bg: #060910;
+  --bg-elev: #0a1120;
+  --surface: #0e1626;
+  --surface-2: #131f33;
+  --line: #1b2b42;
+  --line-strong: #2b4160;
+  --text: #eaf2fb;
+  --muted: #94a8c2;
+  --faint: #63799a;
+  --accent: #6ad5ff;
+  --accent-text: #8fe1ff;
+  /* Ice cyan is a light colour — filled buttons need dark text on it. */
+  --on-accent: #04121c;
+  --accent-weak: rgb(106 213 255 / 0.13);
+  --flow: #9d8cff;
+  --frost: rgb(120 180 230 / 0.07);
+  --frost-edge: rgb(160 210 255 / 0.16);
+  --glow: rgb(106 213 255 / 0.35);
+  --snow: 235, 246, 255;
+  --grid: rgb(150 200 255 / 0.035);
+  --shadow: 0 1px 2px rgb(0 0 0 / 0.5), 0 18px 44px -18px rgb(0 10 30 / 0.85);
+  color-scheme: dark;
+}
+
+/* Snowfield — deeper page tint and darker ink so white cards actually separate. */
+[data-theme='light'] {
+  --bg: #dde8f3;
+  --bg-elev: #ffffff;
+  --surface: #ffffff;
+  --surface-2: #eef4fa;
+  --line: #bed0e1;
+  --line-strong: #92abc3;
+  --text: #05101a;
+  --muted: #375066;
+  --faint: #52697f;
+  --accent: #0a6d92;
+  --accent-text: #06546f;
+  --on-accent: #ffffff;
+  --accent-weak: rgb(10 109 146 / 0.11);
+  --flow: #4437b8;
+  --frost: rgb(255 255 255 / 0.75);
+  --frost-edge: rgb(255 255 255 / 0.95);
+  --glow: rgb(10 109 146 / 0.3);
+  --snow: 130, 165, 200;
+  --grid: rgb(12 45 80 / 0.07);
+  --shadow: 0 1px 2px rgb(10 35 60 / 0.08), 0 14px 34px -16px rgb(10 35 60 / 0.35);
+  color-scheme: light;
+}
+
+/* `inline` keeps utilities pointing at the live var so the theme flips at runtime. */
+@theme inline {
+  --color-bg: var(--bg);
+  --color-bg-elev: var(--bg-elev);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-line: var(--line);
+  --color-line-strong: var(--line-strong);
+  --color-text: var(--text);
+  --color-muted: var(--muted);
+  --color-faint: var(--faint);
+  --color-accent: var(--accent);
+  --color-accent-text: var(--accent-text);
+  --color-accent-weak: var(--accent-weak);
+  --color-on-accent: var(--on-accent);
+  --color-flow: var(--flow);
+
+  --font-sans: 'Inter Variable', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-serif: 'Instrument Serif', ui-serif, Georgia, 'Times New Roman', serif;
+  --font-mono: 'JetBrains Mono Variable', ui-monospace, 'SF Mono', Menlo, monospace;
+
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-spring: cubic-bezier(0.34, 1.4, 0.64, 1);
+}
+
+@layer base {
+  * {
+    border-color: var(--line);
+  }
+
+  html {
+    scroll-behavior: smooth;
+    /* Sticky nav clearance for anchor jumps. */
+    scroll-padding-top: 6rem;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    background-color: var(--bg);
+    color: var(--text);
+    font-family: var(--font-sans);
+    font-feature-settings: 'cv02', 'cv03', 'cv04', 'ss01';
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    overflow-x: hidden;
+  }
+
+  ::selection {
+    background: var(--accent);
+    color: #04121c;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
+    border-radius: 3px;
+  }
+
+  h1, h2, h3, h4 {
+    text-wrap: balance;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  ::-webkit-scrollbar-track {
+    background: var(--bg);
+  }
+  ::-webkit-scrollbar-thumb {
+    background: var(--line-strong);
+    border-radius: 99px;
+    border: 3px solid var(--bg);
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--faint);
+  }
+}
+
+@layer components {
+  /* Fluid display type — the editorial anchor of the page. */
+  .display {
+    font-family: var(--font-serif);
+    font-weight: 400;
+    line-height: 0.94;
+    letter-spacing: -0.025em;
+    font-size: clamp(2.5rem, 6.4vw, 5.25rem);
+  }
+
+  .display-sm {
+    font-family: var(--font-serif);
+    font-weight: 400;
+    line-height: 1;
+    letter-spacing: -0.02em;
+    font-size: clamp(2rem, 5vw, 3.5rem);
+  }
+
+  .eyebrow {
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    font-weight: 500;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--faint);
+  }
+
+  .mono-xs {
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    letter-spacing: 0.04em;
+  }
+
+  /* Hairline grid that sits behind the whole page. */
+  .grid-bg {
+    background-image:
+      linear-gradient(to right, var(--grid) 1px, transparent 1px),
+      linear-gradient(to bottom, var(--grid) 1px, transparent 1px);
+    background-size: 72px 72px;
+  }
+
+  /* Frosted glass — the core winter surface treatment. */
+  .frost {
+    background: linear-gradient(150deg, var(--frost-edge), var(--frost) 42%, transparent);
+    background-color: var(--surface);
+    border: 1px solid var(--line);
+    box-shadow: var(--shadow);
+    backdrop-filter: blur(14px) saturate(150%);
+    -webkit-backdrop-filter: blur(14px) saturate(150%);
+  }
+
+  .card {
+    border-radius: 1rem;
+    background: linear-gradient(150deg, var(--frost-edge), var(--frost) 42%, transparent);
+    background-color: var(--surface);
+    border: 1px solid var(--line);
+    /* Resting elevation — on a light page, border alone doesn't separate a
+       white card from a near-white background. */
+    box-shadow: var(--shadow);
+    transition:
+      border-color 0.5s var(--ease-out-expo),
+      box-shadow 0.5s var(--ease-out-expo),
+      background-color 0.5s var(--ease-out-expo);
+  }
+
+  .card:hover {
+    border-color: var(--line-strong);
+    box-shadow: var(--shadow), 0 0 0 1px var(--accent-weak), 0 22px 50px -24px var(--glow);
+  }
+
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    letter-spacing: 0.02em;
+    padding: 0.3125rem 0.625rem;
+    border-radius: 0.4375rem;
+    border: 1px solid var(--line);
+    background: var(--bg-elev);
+    color: var(--muted);
+    transition:
+      color 0.25s var(--ease-out-expo),
+      border-color 0.25s var(--ease-out-expo),
+      transform 0.25s var(--ease-spring),
+      box-shadow 0.25s var(--ease-out-expo);
+  }
+
+  .chip:hover {
+    color: var(--text);
+    border-color: var(--accent);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 18px -8px var(--glow);
+  }
+
+  /* Underline that wipes in from the left on hover. */
+  .link-wipe {
+    position: relative;
+    display: inline-block;
+  }
+  .link-wipe::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: -2px;
+    height: 1px;
+    width: 100%;
+    background: currentColor;
+    transform: scaleX(0);
+    transform-origin: right;
+    transition: transform 0.45s var(--ease-out-expo);
+  }
+  .link-wipe:hover::after,
+  .link-wipe:focus-visible::after {
+    transform: scaleX(1);
+    transform-origin: left;
+  }
+}
+
+@layer utilities {
+  /* ── 3D primitives ──────────────────────────────────────────────────── */
+
+  /* Parent that establishes the vanishing point for its 3D children. */
+  .scene {
+    perspective: var(--perspective, 1100px);
+    perspective-origin: 50% 45%;
+  }
+
+  .preserve-3d {
+    transform-style: preserve-3d;
+  }
+
+  /* Pointer-driven card tilt. --rx/--ry are written by the tilt script.
+     perspective() is on the element itself so each card gets its own
+     vanishing point at its centre — a shared parent perspective would skew
+     cards further from the page's midline. */
+  .tilt {
+    transform-style: preserve-3d;
+    transform: perspective(900px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg));
+    transition: transform 0.7s var(--ease-out-expo);
+    will-change: transform;
+  }
+
+  .tilt.is-tilting {
+    /* Snappier while tracking; the slow ease is only for the release. */
+    transition: transform 0.12s linear;
+  }
+
+  /* Lifts inner content off the card face so the tilt reads as depth. */
+  .tilt-lift {
+    transform: translateZ(var(--lift, 28px));
+  }
+
+  .tilt-lift-sm {
+    transform: translateZ(14px);
+  }
+
+  /* Specular sheen that slides across a tilted surface. */
+  .tilt-sheen::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.5s var(--ease-out-expo);
+    background: radial-gradient(
+      340px circle at var(--mx, 50%) var(--my, 50%),
+      rgb(var(--snow) / 0.14),
+      transparent 66%
+    );
+  }
+
+  .tilt-sheen:hover::after,
+  .tilt-sheen:focus-within::after {
+    opacity: 1;
+  }
+
+  /* ── Scroll reveal ──────────────────────────────────────────────────── */
+
+  /* JS adds .is-visible; without JS everything stays visible. */
+  .reveal {
+    opacity: 0;
+    transform: translateY(22px);
+    transition:
+      opacity 0.85s var(--ease-out-expo),
+      transform 0.85s var(--ease-out-expo);
+    transition-delay: var(--reveal-delay, 0ms);
+    will-change: opacity, transform;
+  }
+
+  .reveal.is-visible {
+    opacity: 1;
+    transform: none;
+  }
+
+  .no-js .reveal {
+    opacity: 1;
+    transform: none;
+  }
+
+  /* Reveal that rises out of the page in 3D rather than straight up. */
+  .reveal-3d {
+    opacity: 0;
+    transform: perspective(1200px) rotateX(12deg) translateY(34px) scale(0.97);
+    transition:
+      opacity 0.95s var(--ease-out-expo),
+      transform 0.95s var(--ease-out-expo);
+    transition-delay: var(--reveal-delay, 0ms);
+    will-change: opacity, transform;
+  }
+
+  .reveal-3d.is-visible {
+    opacity: 1;
+    transform: perspective(1200px) rotateX(0) translateY(0) scale(1);
+  }
+
+  .no-js .reveal-3d {
+    opacity: 1;
+    transform: none;
+  }
+
+  /* Hero lines start below their mask — but only when JS is there to lift them. */
+  html:not(.no-js) [data-hero-line] {
+    transform: translateY(110%);
+    transition: transform 1.1s var(--ease-out-expo);
+    transition-delay: var(--line-delay, 0ms);
+  }
+
+  html:not(.no-js) [data-hero-line].is-in {
+    transform: none;
+  }
+
+  /* ── Ambient winter motion ──────────────────────────────────────────── */
+
+  .dot-pulse {
+    animation: dot-pulse 2.4s ease-in-out infinite;
+  }
+
+  @keyframes dot-pulse {
+    0%, 100% { opacity: 1; box-shadow: 0 0 0 0 var(--accent-weak); }
+    50% { opacity: 0.75; box-shadow: 0 0 0 6px transparent; }
+  }
+
+  @keyframes marquee {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+  }
+
+  .marquee-track {
+    animation: marquee 46s linear infinite;
+  }
+
+  .marquee:hover .marquee-track {
+    animation-play-state: paused;
+  }
+
+  /* Fade the marquee edges instead of hard-cutting them. */
+  .edge-fade {
+    -webkit-mask-image: linear-gradient(to right, transparent, #000 8%, #000 92%, transparent);
+    mask-image: linear-gradient(to right, transparent, #000 8%, #000 92%, transparent);
+  }
+
+  /* Slow aurora drift behind the page. */
+  @keyframes aurora-drift {
+    0%   { transform: translate3d(-6%, -3%, 0) rotate(-6deg) scale(1.05); }
+    50%  { transform: translate3d(6%, 4%, 0) rotate(5deg) scale(1.15); }
+    100% { transform: translate3d(-6%, -3%, 0) rotate(-6deg) scale(1.05); }
+  }
+
+  .aurora {
+    animation: aurora-drift var(--aurora-duration, 26s) ease-in-out infinite;
+  }
+
+  /* Continuous Y-axis spin for the 3D snowflake. */
+  @keyframes crystal-spin {
+    from { transform: rotateX(-16deg) rotateY(0deg); }
+    to   { transform: rotateX(-16deg) rotateY(360deg); }
+  }
+
+  @keyframes float-y {
+    0%, 100% { transform: translateY(0); }
+    50%      { transform: translateY(-14px); }
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+  .reveal,
+  .reveal-3d,
+  html:not(.no-js) [data-hero-line] {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+  /* Depth stays, motion goes. */
+  .tilt {
+    transform: none !important;
+  }
+}

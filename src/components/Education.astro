@@ -1,0 +1,71 @@
+---
+import Section from './Section.astro';
+import { education, achievements } from '../data/site';
+---
+
+<Section
+  id="education"
+  index="05"
+  title="Education & highlights"
+  lead="Formal grounding in computer science, plus the things I'm most often told made a difference on a team."
+>
+  <h2 slot="heading" class="display-sm mt-5 max-w-3xl">
+    Background and <em class="text-accent">highlights</em>.
+  </h2>
+
+  <div class="grid gap-12 lg:grid-cols-[0.85fr_1.15fr] lg:gap-16">
+    <div>
+      <h3 class="eyebrow mb-6">Education</h3>
+      <ol class="space-y-4">
+        {
+          education.map((e, i) => (
+            <li class="reveal-3d" style={`--reveal-delay:${i * 90}ms`}>
+              <article class="card tilt tilt-sheen relative p-6" data-tilt="6">
+                <div class="tilt-lift-sm">
+                  <div class="flex items-baseline justify-between gap-4">
+                    <span class="mono-xs text-faint">{String(i + 1).padStart(2, '0')}</span>
+                    <time class="mono-xs text-accent-text">{e.year}</time>
+                  </div>
+                  <h4 class="mt-4 text-[15px] font-semibold leading-snug tracking-tight text-text">
+                    {e.degree}
+                  </h4>
+                  <p class="mt-1.5 text-[13.5px] text-muted">{e.institution}</p>
+                  {e.note && <p class="mt-3 text-[13px] leading-relaxed text-faint">{e.note}</p>}
+                </div>
+              </article>
+            </li>
+          ))
+        }
+      </ol>
+    </div>
+
+    <div>
+      <h3 class="eyebrow mb-6">Achievements & strengths</h3>
+      <ul class="grid gap-px overflow-hidden rounded-xl border border-line bg-line sm:grid-cols-2">
+        {
+          achievements.map((a, i) => (
+            <li
+              class="reveal group bg-bg-elev p-5 transition-colors duration-500 hover:bg-surface-2"
+              style={`--reveal-delay:${(i % 2) * 70}ms`}
+            >
+              <svg
+                class="h-4 w-4 text-accent transition-transform duration-500 group-hover:scale-110"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.7"
+                aria-hidden="true"
+              >
+                <path d="M20 6L9 17l-5-5" />
+              </svg>
+              <h4 class="mt-3 text-[14px] font-semibold leading-snug tracking-tight text-text">
+                {a.title}
+              </h4>
+              <p class="mt-1.5 text-[13px] leading-relaxed text-muted">{a.body}</p>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </div>
+</Section>

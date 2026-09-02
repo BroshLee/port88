@@ -1,0 +1,73 @@
+---
+import { person, socials, nav } from '../data/site';
+const year = new Date().getFullYear();
+---
+
+<footer class="border-t border-line pt-14 pb-10">
+  <div class="mx-auto max-w-6xl px-5 sm:px-8">
+    <div class="flex flex-col gap-10 sm:flex-row sm:items-start sm:justify-between">
+      <div>
+        <a href="#top" class="display-sm link-wipe inline-block">{person.name}</a>
+        <p class="mt-3 max-w-sm text-[13.5px] leading-relaxed text-muted">
+          {person.headline} · {person.location}
+        </p>
+      </div>
+
+      <div class="flex gap-12">
+        <nav aria-label="Footer">
+          <span class="eyebrow">Sections</span>
+          <ul class="mt-4 space-y-2.5">
+            {
+              nav.map((n) => (
+                <li>
+                  <a
+                    href={`#${n.id}`}
+                    class="link-wipe text-[13.5px] text-muted transition-colors hover:text-text"
+                  >
+                    {n.label}
+                  </a>
+                </li>
+              ))
+            }
+          </ul>
+        </nav>
+
+        <div>
+          <span class="eyebrow">Connect</span>
+          <ul class="mt-4 space-y-2.5">
+            {
+              socials.map((s) => (
+                <li>
+                  <a
+                    href={s.href}
+                    target={s.href.startsWith('mailto:') ? undefined : '_blank'}
+                    rel="noopener noreferrer"
+                    class="link-wipe text-[13.5px] text-muted transition-colors hover:text-text"
+                  >
+                    {s.label}
+                  </a>
+                </li>
+              ))
+            }
+            <li>
+              <a
+                href={person.resumePath}
+                download
+                class="link-wipe text-[13.5px] text-muted transition-colors hover:text-text"
+              >
+                Résumé
+              </a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div
+      class="mt-14 flex flex-col gap-3 border-t border-line pt-6 sm:flex-row sm:items-center sm:justify-between"
+    >
+      <p class="mono-xs text-faint">© {year} {person.name}. All rights reserved.</p>
+      <p class="mono-xs text-faint">Built with Astro · Tailwind CSS</p>
+    </div>
+  </div>
+</footer>
