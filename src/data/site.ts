@@ -6,8 +6,8 @@
 // ─── FILL THESE IN ────────────────────────────────────────────────────────────
 // Placeholders. Replace with your real profile URLs before deploying.
 export const PROFILE_URLS = {
-  github: 'https://github.com/ankitsaklani',
-  linkedin: 'https://www.linkedin.com/in/ankitsaklani',
+  github: 'https://github.com/BroshLee',
+  linkedin: 'https://www.linkedin.com/in/ankit-saklani-269730193/',
 };
 
 // Web3Forms access key for the contact form (free, no backend).
@@ -328,7 +328,7 @@ export const nav = [
 ];
 
 export const socials = [
-  { label: 'GitHub', href: PROFILE_URLS.github, handle: '@ankitsaklani' },
-  { label: 'LinkedIn', href: PROFILE_URLS.linkedin, handle: 'in/ankitsaklani' },
+  { label: 'GitHub', href: PROFILE_URLS.github, handle: '@BroshLee' },
+  { label: 'LinkedIn', href: PROFILE_URLS.linkedin, handle: 'ankit-saklani-269730193' },
   { label: 'Email', href: `mailto:${person.email}`, handle: person.email },
 ];
