@@ -409,53 +409,96 @@ function initContactForm() {
   const form = document.querySelector<HTMLFormElement>('[data-contact-form]');
   if (!form) return;
 
+  const fields = form.querySelector<HTMLElement>('[data-form-fields]');
+  const success = form.querySelector<HTMLElement>('[data-form-success]');
   const status = form.querySelector<HTMLElement>('[data-form-status]');
   const button = form.querySelector<HTMLButtonElement>('[data-submit]');
   const label = form.querySelector<HTMLElement>('[data-submit-label]');
-  const key = form.querySelector<HTMLInputElement>('[name="access_key"]')?.value ?? '';
-  const configured = Boolean(key) && !key.startsWith('YOUR_');
+  const again = form.querySelector<HTMLButtonElement>('[data-send-another]');
 
-  const say = (msg: string, ok: boolean) => {
+  const say = (msg: string) => {
     if (!status) return;
     status.textContent = msg;
-    status.classList.remove('hidden');
-    status.style.color = ok ? 'var(--accent-text)' : '#ef5350';
+    status.classList.toggle('hidden', !msg);
   };
+
+  // Per-field messages beat one generic line — the visitor sees what to fix.
+  const firstProblem = (): { el: HTMLInputElement | HTMLTextAreaElement; msg: string } | null => {
+    const get = <T extends HTMLElement>(n: string) =>
+      form.querySelector<T>(`[name="${n}"]`) as T;
+    const name = get<HTMLInputElement>('name');
+    const email = get<HTMLInputElement>('email');
+    const message = get<HTMLTextAreaElement>('message');
+
+    if (!name.value.trim()) return { el: name, msg: 'Please enter your name.' };
+    if (!email.value.trim()) return { el: email, msg: 'Please enter your email address.' };
+    if (!email.checkValidity())
+      return { el: email, msg: 'That email address doesn’t look right.' };
+    if (message.value.trim().length < 10)
+      return { el: message, msg: 'Please write a little more so I know what you need.' };
+    return null;
+  };
+
+  const showSuccess = () => {
+    fields?.classList.add('hidden');
+    success?.classList.remove('hidden');
+    say('');
+    // Move focus so screen readers announce the result rather than nothing.
+    success?.querySelector<HTMLElement>('[data-success-heading]')?.focus();
+  };
+
+  again?.addEventListener('click', () => {
+    form.reset();
+    success?.classList.add('hidden');
+    fields?.classList.remove('hidden');
+    form.querySelector<HTMLInputElement>('[name="name"]')?.focus();
+  });
 
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
 
-    if (!form.checkValidity()) {
-      say('Please fill in your name, a valid email, and a message.', false);
-      form.reportValidity();
+    const problem = firstProblem();
+    if (problem) {
+      say(problem.msg);
+      problem.el.focus();
       return;
     }
 
-    const data = new FormData(form);
-
-    // Without a form key there's no backend to post to — hand off to the mail client.
-    if (!configured) {
-      const to = form.dataset.mailto ?? '';
-      const body = `${data.get('message')}\n\n— ${data.get('name')} (${data.get('email')})`;
-      window.location.href = `${to}?subject=${encodeURIComponent('Portfolio enquiry')}&body=${encodeURIComponent(body)}`;
-      say('Opening your email client…', true);
-      return;
-    }
-
+    say('');
     if (button) button.disabled = true;
     if (label) label.textContent = 'Sending…';
+
+    // Without this, a stalled connection leaves the button disabled on
+    // "Sending…" indefinitely with no way for the visitor to retry.
+    const timeout = AbortSignal.timeout ? AbortSignal.timeout(15000) : undefined;
+
+    const payload = new FormData(form);
+    // So hitting Reply in Gmail goes to the visitor, not to Web3Forms.
+    payload.set('replyto', String(payload.get('email') ?? ''));
 
     try {
       const res = await fetch(form.dataset.endpoint!, {
         method: 'POST',
         headers: { Accept: 'application/json' },
-        body: data,
+        body: payload,
+        signal: timeout,
       });
-      if (!res.ok) throw new Error(String(res.status));
-      form.reset();
-      say('Thanks — your message is on its way. I’ll get back to you shortly.', true);
-    } catch {
-      say('Something went wrong. Email me directly at saklanis960@gmail.com.', false);
+
+      // Web3Forms answers 200 with {success:false} for a bad or unverified key,
+      // so the status code alone isn't enough to trust.
+      const body = await res.json().catch(() => null);
+      if (!res.ok || body?.success === false) {
+        throw new Error(body?.message || `HTTP ${res.status}`);
+      }
+
+      showSuccess();
+    } catch (err) {
+      // Never hand off to a mail client — just say so and leave the text intact
+      // so nothing the visitor typed is lost.
+      say(
+        `Sorry, the message couldn’t be sent just now. Please email me directly at ${form.dataset.email}.`
+      );
+      console.error('[contact]', err);
     } finally {
       if (button) button.disabled = false;
       if (label) label.textContent = 'Send message';
