@@ -11,8 +11,9 @@ export const PROFILE_URLS = {
 };
 
 // Web3Forms access key for the contact form (free, no backend).
-// Get one at https://web3forms.com — it emails submissions straight to you.
-export const CONTACT_FORM_KEY = 'YOUR_WEB3FORMS_ACCESS_KEY';
+// Public by design — it ships in the page source, so it isn't a secret.
+// Submissions are delivered to the address this key was registered against.
+export const CONTACT_FORM_KEY = 'ed3bbe4f-57a1-4f23-954b-84a7d39d151a';
 // ──────────────────────────────────────────────────────────────────────────────
 
 export const person = {

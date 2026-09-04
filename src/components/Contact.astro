@@ -92,7 +92,7 @@ import { person, socials, CONTACT_FORM_KEY } from '../data/site';
         class="card p-6 sm:p-8"
         data-contact-form
         data-endpoint="https://api.web3forms.com/submit"
-        data-mailto={`mailto:${person.email}`}
+        data-email={person.email}
         novalidate
       >
         <input type="hidden" name="access_key" value={CONTACT_FORM_KEY} />
@@ -107,6 +107,7 @@ import { person, socials, CONTACT_FORM_KEY } from '../data/site';
           autocomplete="off"
         />
 
+        <div data-form-fields>
         <div class="grid gap-5 sm:grid-cols-2">
           <div>
             <label for="cf-name" class="eyebrow mb-2 block">Name</label>
@@ -167,12 +168,49 @@ import { person, socials, CONTACT_FORM_KEY } from '../data/site';
         </div>
 
         <p
-          class="mt-4 hidden text-[13px] leading-relaxed"
+          class="mt-4 hidden text-[13px] leading-relaxed text-[#ef5350]"
           data-form-status
-          role="status"
-          aria-live="polite"
+          role="alert"
+          aria-live="assertive"
         >
         </p>
+        </div>
+
+        {/* Swapped in place of the fields once the message is delivered. */}
+        <div class="hidden py-6 text-center" data-form-success>
+          <span
+            class="mx-auto grid h-12 w-12 place-items-center rounded-full border border-accent/40 bg-accent-weak"
+            aria-hidden="true"
+          >
+            <svg
+              class="h-5 w-5 text-accent"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+            >
+              <path d="M20 6L9 17l-5-5"></path>
+            </svg>
+          </span>
+          <h3
+            class="display-sm mt-5 text-[1.75rem]"
+            data-success-heading
+            tabindex="-1"
+          >
+            Message sent
+          </h3>
+          <p class="mx-auto mt-3 max-w-sm text-[14px] leading-relaxed text-muted">
+            Thanks for reaching out — it's landed in my inbox and I'll reply within a day.
+          </p>
+          <button
+            type="button"
+            class="mt-6 rounded-xl border border-line bg-surface px-4 py-2.5 text-[13px] font-medium text-text transition-colors duration-300 hover:border-line-strong"
+            data-send-another
+          >
+            Send another message
+          </button>
+        </div>
       </form>
     </div>
   </div>
