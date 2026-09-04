@@ -138,11 +138,14 @@ function initReveals() {
 
   // Anything already on screen shows immediately — no waiting on the first
   // observer callback, which never arrives if the tab isn't compositing.
+  // Every rect is read before any class is written: interleaving them
+  // invalidates layout on each write and forces a reflow on the next read.
   const vh = window.innerHeight;
-  items.forEach((el) => {
+  const onScreen = items.filter((el) => {
     const r = el.getBoundingClientRect();
-    if (r.top < vh && r.bottom > 0) el.classList.add('is-visible');
+    return r.top < vh && r.bottom > 0;
   });
+  onScreen.forEach((el) => el.classList.add('is-visible'));
 
   // Last-resort net: content must never stay hidden because the observer
   // never ran. Keyed on the observer itself, not on how many items happen
@@ -150,17 +153,6 @@ function initReveals() {
   window.setTimeout(() => {
     if (!observerFired) showAll();
   }, 2500);
-}
-
-/* ── Hero entrance ─────────────────────────────────────────────────────── */
-function initHero() {
-  const lines = Array.from(document.querySelectorAll<HTMLElement>('[data-hero-line]'));
-  if (!lines.length) return;
-
-  lines.forEach((line, i) => {
-    if (!reduceMotion) line.style.setProperty('--line-delay', `${120 + i * 90}ms`);
-    line.classList.add('is-in');
-  });
 }
 
 /* ── Experience timeline rail ──────────────────────────────────────────── */
@@ -511,7 +503,6 @@ function boot() {
   initTheme();
   initNav();
   initReveals();
-  initHero();
   initTimeline();
   initTilt();
   initArchScene();

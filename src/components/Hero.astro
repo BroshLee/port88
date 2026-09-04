@@ -44,9 +44,10 @@ const lines = hero.titleLines.map((line) => {
 
         <h1 class="display mt-6" data-hero-title>
           {
-            lines.map((l) => (
+            lines.map((l, i) => (
               <span class="block overflow-hidden pb-[0.06em]">
-                <span class="block" data-hero-line>
+                {/* Stagger is server-rendered so the animation needs no JS. */}
+                <span class="block" data-hero-line style={`--line-delay:${i * 70}ms`}>
                   {l.before}
                   {l.mark && <em class="not-italic text-accent">{l.mark}</em>}
                   {l.after}

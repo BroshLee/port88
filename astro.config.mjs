@@ -8,6 +8,8 @@ export default defineConfig({
   site: 'https://ankitsaklani.dev',
   integrations: [sitemap()],
   vite: { plugins: [tailwindcss()] },
-  build: { inlineStylesheets: 'auto' },
+  // The single page's CSS was a render-blocking request on the critical path.
+  // Inlining trades a slightly larger HTML payload for one fewer round trip.
+  build: { inlineStylesheets: 'always' },
   compressHTML: true,
 });
