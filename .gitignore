@@ -7,3 +7,5 @@ dist/
 .vercel
 .netlify
 npm-debug.log*
+.test
+package-lock.json
