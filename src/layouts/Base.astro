@@ -52,7 +52,6 @@ const jsonLd = {
   data-theme="dark"
   data-design={FIXED_DESIGN ?? 'ember'}
   data-design-mode={DESIGN_MODE}
-  class="no-js"
 >
   <head>
     <meta charset="utf-8" />
@@ -84,7 +83,6 @@ const jsonLd = {
     <script is:inline>
       (() => {
         const root = document.documentElement;
-        root.classList.remove('no-js');
 
         const pick = () => (Math.random() < 0.5 ? 'ember' : 'winter');
         const valid = (d) => d === 'ember' || d === 'winter';

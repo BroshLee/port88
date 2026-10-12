@@ -31,7 +31,7 @@ const lines = hero.titleLines.map((line) => {
   <div class="relative mx-auto max-w-6xl px-5 sm:px-8">
     <div class="grid items-center gap-12 lg:grid-cols-[1fr_1.12fr] lg:gap-12">
       <div>
-        <div class="reveal flex flex-wrap items-center gap-3">
+        <div class="rise-in flex flex-wrap items-center gap-3">
           {
             person.available && (
               <span class="inline-flex items-center gap-2 rounded-full border border-line bg-surface px-3 py-1.5">
@@ -58,13 +58,13 @@ const lines = hero.titleLines.map((line) => {
         </h1>
 
         <p
-          class="reveal mt-7 max-w-xl text-[15px] leading-relaxed text-muted sm:text-base"
+          class="rise-in rise-in-solid mt-7 max-w-xl text-[15px] leading-relaxed text-muted sm:text-base"
           style="--reveal-delay:200ms"
         >
           {hero.intro}
         </p>
 
-        <div class="reveal mt-9 flex flex-wrap items-center gap-3" style="--reveal-delay:280ms">
+        <div class="rise-in mt-9 flex flex-wrap items-center gap-3" style="--reveal-delay:280ms">
           <a
             href="#work"
             class="group inline-flex items-center gap-2 rounded-xl bg-accent px-5 py-3 text-sm font-semibold text-on-accent transition-transform duration-300 hover:-translate-y-0.5"
@@ -101,7 +101,7 @@ const lines = hero.titleLines.map((line) => {
           </a>
         </div>
 
-        <dl class="reveal mt-12 grid grid-cols-2 gap-px overflow-hidden rounded-xl border border-line bg-line sm:grid-cols-4" style="--reveal-delay:360ms">
+        <dl class="rise-in mt-12 grid grid-cols-2 gap-px overflow-hidden rounded-xl border border-line bg-line sm:grid-cols-4" style="--reveal-delay:360ms">
           {
             hero.stats.map((s) => (
               <div class="bg-bg-elev px-4 py-4">
@@ -116,7 +116,7 @@ const lines = hero.titleLines.map((line) => {
         </dl>
       </div>
 
-      <div class="reveal relative lg:pl-4" style="--reveal-delay:440ms">
+      <div class="rise-in relative lg:pl-4" style="--reveal-delay:440ms">
         {
           Crystal && (
             /* Sits behind the card so it reads as rising out from behind it. */

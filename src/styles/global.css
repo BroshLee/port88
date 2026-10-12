@@ -3,6 +3,37 @@
 /* Dark is the default; the toggle writes data-theme onto <html>. */
 @custom-variant light (&:where([data-theme='light'], [data-theme='light'] *));
 
+/* ── Metric-matched fallbacks ───────────────────────────────────────────────
+   On slow networks the web fonts land seconds after first paint. These local
+   faces are scaled to the web fonts' metrics so the swap doesn't reflow text.
+   Values measured from the shipped latin subsets against Arial / Times / Courier. */
+@font-face {
+  font-family: 'Inter Fallback';
+  src: local('Arial'), local('ArialMT'), local('Liberation Sans');
+  size-adjust: 105.99%;
+  ascent-override: 91.4%;
+  descent-override: 22.76%;
+  line-gap-override: 0%;
+}
+
+@font-face {
+  font-family: 'Instrument Serif Fallback';
+  src: local('Times New Roman'), local('TimesNewRomanPSMT'), local('Liberation Serif');
+  size-adjust: 80.78%;
+  ascent-override: 122.56%;
+  descent-override: 38.38%;
+  line-gap-override: 0%;
+}
+
+@font-face {
+  font-family: 'JetBrains Mono Fallback';
+  src: local('Courier New'), local('CourierNewPSMT'), local('Liberation Mono');
+  size-adjust: 99.98%;
+  ascent-override: 102.02%;
+  descent-override: 30%;
+  line-gap-override: 0%;
+}
+
 /* ── Palettes ───────────────────────────────────────────────────────────────
    Two designs × two modes. `data-design` is stamped server-side from
    src/data/design.ts; `data-theme` is the visitor's light/dark choice.
@@ -129,9 +160,9 @@
   --color-on-accent: var(--on-accent);
   --color-flow: var(--flow);
 
-  --font-sans: 'Inter Variable', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
-  --font-serif: 'Instrument Serif', ui-serif, Georgia, 'Times New Roman', serif;
-  --font-mono: 'JetBrains Mono Variable', ui-monospace, 'SF Mono', Menlo, monospace;
+  --font-sans: 'Inter Variable', 'Inter Fallback', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-serif: 'Instrument Serif', 'Instrument Serif Fallback', ui-serif, Georgia, 'Times New Roman', serif;
+  --font-mono: 'JetBrains Mono Variable', 'JetBrains Mono Fallback', ui-monospace, 'SF Mono', Menlo, monospace;
 
   --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
   --ease-spring: cubic-bezier(0.34, 1.4, 0.64, 1);
@@ -360,51 +391,63 @@
     transform: translateZ(14px);
   }
 
-  /* Reveal that rises out of the page in 3D rather than straight up. */
-  .reveal-3d {
-    opacity: 0;
-    transform: perspective(1200px) rotateX(12deg) translateY(34px) scale(0.97);
-    transition:
-      opacity 0.95s var(--ease-out-expo),
-      transform 0.95s var(--ease-out-expo);
-    transition-delay: var(--reveal-delay, 0ms);
-    will-change: opacity, transform;
-  }
-
-  .reveal-3d.is-visible {
-    opacity: 1;
-    transform: perspective(1200px) rotateX(0) translateY(0) scale(1);
-  }
-
-  .no-js .reveal-3d {
-    opacity: 1;
-    transform: none;
-  }
-
   @keyframes float-y {
     0%, 100% { transform: translateY(0); }
     50%      { transform: translateY(-14px); }
   }
 
-  /* Scroll-reveal base state. JS adds .is-visible; without JS everything stays visible. */
-  .reveal {
-    opacity: 0;
-    transform: translateY(22px);
+  /* Scroll reveals. Content is visible by default; the hidden start state only
+     applies once main.ts adds .reveal-armed, so a slow or failed script bundle
+     can never leave the page blank. No permanent will-change: dozens of idle
+     layers cost GPU memory and cause blank tiles on fast mobile scrolls. */
+  .reveal,
+  .reveal-3d {
     transition:
-      opacity 0.85s var(--ease-out-expo),
-      transform 0.85s var(--ease-out-expo);
+      opacity 0.6s var(--ease-out-expo),
+      transform 0.6s var(--ease-out-expo);
     transition-delay: var(--reveal-delay, 0ms);
-    will-change: opacity, transform;
   }
 
-  .reveal.is-visible {
-    opacity: 1;
-    transform: none;
+  .reveal-armed .reveal:not(.is-visible) {
+    opacity: 0;
+    transform: translateY(18px);
   }
 
-  .no-js .reveal {
-    opacity: 1;
-    transform: none;
+  /* Rises out of the page in 3D rather than straight up. */
+  .reveal-armed .reveal-3d:not(.is-visible) {
+    opacity: 0;
+    transform: perspective(1200px) rotateX(10deg) translateY(28px) scale(0.97);
+  }
+
+  /* Fast scrolls and jumps skip the animation so content is simply there. */
+  .reveal.is-instant,
+  .reveal-3d.is-instant {
+    transition: none;
+  }
+
+  /* Above-the-fold entrance driven by CSS, not the script: it starts at first
+     paint even when the JS bundle is still downloading on a slow network. */
+  .rise-in {
+    animation: rise-in 0.7s var(--ease-out-expo) var(--reveal-delay, 0ms) both;
+  }
+
+  @keyframes rise-in {
+    from {
+      opacity: 0;
+      transform: translateY(18px);
+    }
+  }
+
+  /* For the LCP element: slides but never fades, since Chrome ignores paints
+     at opacity 0 and would report LCP only at the next repaint (font swap). */
+  .rise-in-solid {
+    animation-name: rise-in-solid;
+  }
+
+  @keyframes rise-in-solid {
+    from {
+      transform: translateY(18px);
+    }
   }
 
   /* Hero lines rise out of their mask. Driven by a CSS animation rather than a
@@ -480,6 +523,7 @@
   }
   .reveal,
   .reveal-3d,
+  .rise-in,
   [data-hero-line] {
     opacity: 1 !important;
     transform: none !important;

@@ -37,7 +37,10 @@ function initNav() {
   const menuBtn = document.querySelector<HTMLButtonElement>('[data-menu-toggle]');
   const menu = document.querySelector<HTMLElement>('#mobile-menu');
 
-  const onScroll = () => {
+  let navFrame = 0;
+
+  const update = () => {
+    navFrame = 0;
     const y = window.scrollY;
     if (header) {
       const scrolled = y > 12;
@@ -52,8 +55,15 @@ function initNav() {
     }
   };
 
-  onScroll();
-  window.addEventListener('scroll', onScroll, { passive: true });
+  update();
+  // Once per frame: a fast fling fires scroll events faster than paints.
+  window.addEventListener(
+    'scroll',
+    () => {
+      if (!navFrame) navFrame = requestAnimationFrame(update);
+    },
+    { passive: true }
+  );
 
   if (menuBtn && menu) {
     const close = () => {
@@ -110,49 +120,90 @@ function initNav() {
 
 /* ── Scroll reveals ────────────────────────────────────────────────────── */
 function initReveals() {
-  const items = Array.from(document.querySelectorAll<HTMLElement>('.reveal, .reveal-3d'));
-  if (!items.length) return;
+  const pending = new Set(document.querySelectorAll<HTMLElement>('.reveal, .reveal-3d'));
+  // Unarmed, the CSS leaves everything visible — the right outcome here too.
+  if (!pending.size || reduceMotion) return;
 
-  const showAll = () => items.forEach((el) => el.classList.add('is-visible'));
+  const root = document.documentElement;
+  const settle: HTMLElement[] = [];
+  let frame = 0;
+  let lastY = window.scrollY;
+  let lastT = performance.now();
+  let fastUntil = 0;
 
-  if (reduceMotion || !('IntersectionObserver' in window)) {
-    showAll();
-    return;
+  // Checked on scroll in a rAF rather than via IntersectionObserver: the
+  // observer reports a frame late and never reports sections that were jumped
+  // straight past, which is what left holes when scrolling back up.
+  const sweep = (instant: boolean, reach: number) => {
+    // Every rect is read before any class is written, so a sweep costs one layout.
+    const due = Array.from(pending, (el) => [el, el.getBoundingClientRect().top] as const).filter(
+      ([, top]) => top < reach
+    );
+
+    due.forEach(([el, top]) => {
+      pending.delete(el);
+      // Anything at or above the top edge is content the reader already passed.
+      if (instant || top < 0) {
+        el.classList.add('is-instant');
+        settle.push(el);
+      }
+      el.classList.add('is-visible');
+    });
+
+    if (!pending.size) teardown();
+    if (settle.length) {
+      // Two frames so the visible state is committed before transitions return.
+      requestAnimationFrame(() =>
+        requestAnimationFrame(() => settle.splice(0).forEach((el) => el.classList.remove('is-instant')))
+      );
+    }
+  };
+
+  const schedule = () => {
+    if (!frame) frame = requestAnimationFrame(() => {
+      frame = 0;
+      const vh = window.innerHeight;
+      // While flying through the page, reveal well ahead so nothing lands blank.
+      if (performance.now() < fastUntil) sweep(true, vh * 2);
+      else sweep(false, vh * 0.92);
+    });
+  };
+
+  const onScroll = () => {
+    const now = performance.now();
+    const y = window.scrollY;
+    const dy = Math.abs(y - lastY);
+    const dt = now - lastT;
+    // A jump of most of a screen (End key, scrollbar drag, anchor link) or a
+    // flick past ~2.5px/ms means "take me there" — animating would show blanks.
+    if (dy > window.innerHeight * 0.6 || (dt > 0 && dt < 100 && dy / dt > 2.5)) {
+      fastUntil = now + 200;
+    }
+    lastY = y;
+    lastT = now;
+    schedule();
+  };
+
+  // Late font swaps and the contact form's success state move content without
+  // any scroll, so a layout change has to trigger a check too.
+  const resizeObserver = new ResizeObserver(schedule);
+
+  function teardown() {
+    window.removeEventListener('scroll', onScroll);
+    window.removeEventListener('resize', schedule);
+    resizeObserver.disconnect();
   }
 
-  let observerFired = false;
+  // Content was already painted visible before this script arrived, so
+  // whatever is on screen (or above it) stays put instead of re-animating.
+  // Run synchronously before arming so no frame shows it hidden.
+  sweep(true, window.innerHeight);
+  root.classList.add('reveal-armed');
+  if (!pending.size) return;
 
-  const io = new IntersectionObserver(
-    (entries, obs) => {
-      observerFired = true;
-      entries.forEach((e) => {
-        if (!e.isIntersecting) return;
-        e.target.classList.add('is-visible');
-        obs.unobserve(e.target);
-      });
-    },
-    { threshold: 0.12, rootMargin: '0px 0px -8% 0px' }
-  );
-
-  items.forEach((el) => io.observe(el));
-
-  // Anything already on screen shows immediately — no waiting on the first
-  // observer callback, which never arrives if the tab isn't compositing.
-  // Every rect is read before any class is written: interleaving them
-  // invalidates layout on each write and forces a reflow on the next read.
-  const vh = window.innerHeight;
-  const onScreen = items.filter((el) => {
-    const r = el.getBoundingClientRect();
-    return r.top < vh && r.bottom > 0;
-  });
-  onScreen.forEach((el) => el.classList.add('is-visible'));
-
-  // Last-resort net: content must never stay hidden because the observer
-  // never ran. Keyed on the observer itself, not on how many items happen
-  // to be revealed — a couple of above-fold items is not proof it works.
-  window.setTimeout(() => {
-    if (!observerFired) showAll();
-  }, 2500);
+  window.addEventListener('scroll', onScroll, { passive: true });
+  window.addEventListener('resize', schedule, { passive: true });
+  resizeObserver.observe(document.body);
 }
 
 /* ── Experience timeline rail ──────────────────────────────────────────── */
